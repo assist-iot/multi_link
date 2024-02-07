@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "initserver.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "initserver.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      hostNetwork: {{ .Values.initserver.hostNetwork }}
+      {{- with .Values.initserver.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.initserver.podSecurityContext | nindent 8 }}
+      containers:
+      - name: initserver
+        securityContext:
+          {{- toYaml .Values.initserver.securityContext | nindent 12 }}
+        image: "{{ .Values.initserver.image.repository }}:{{ .Values.initserver.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.initserver.image.pullPolicy }}
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            while true; do
+                curl -X POST http://{{ .Values.hostIp }}:{{ .Values.api.service.ports.api.port }}/v1/server/stop/{{ .Values.serverConfig.bridge_interface }}
+                response=$(curl -s -w "%{http_code}" -X POST http://{{ .Values.hostIp }}:{{ .Values.api.service.ports.api.port }}/v1/server/start -H 'Content-Type: application/json' -d '{
+                "bridge_interface": "{{ .Values.serverConfig.bridge_interface }}",
+                "bridge_ip": "{{ .Values.serverConfig.bridge_ip }}",
+                "links": "{{ .Values.serverConfig.links }}"
+              }')
+              status_code=${response: -3} # Get the last 3 characters of the response (HTTP status code)
+              if [ "$status_code" = "200" ]; then
+                break # Exit the loop if HTTP status code is 200 (OK)
+              else
+                sleep 5 # Wait for 5 seconds before making the next request
+              fi
+            done;
+            while true; do 
+              sleep 30 
+            done;
+      restartPolicy: {{ .Values.initserver.restartPolicy }}
+  backoffLimit: {{ .Values.initserver.backoffLimit }}

@@ -1,0 +1,159 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+      "active_slave": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "ad_actor_key": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "ad_actor_sys_prio": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "ad_actor_system": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "ad_aggregator": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "ad_num_ports": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "ad_partner_key": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "ad_partner_mac": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "ad_select": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "ad_user_port_key": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "all_slaves_active": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "arp_all_targets": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "arp_interval": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "arp_ip_target": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "arp_missed_max": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "arp_validate": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "downdelay": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "fail_over_mac": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "lacp_active": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "lacp_rate": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "lp_interval": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "mii_status": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "miimon": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "min_links": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "mode": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "num_grat_arp": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "num_unsol_na": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "packets_per_slave": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "peer_notif_delay": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "primary": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "primary_reselect": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "queue_id": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "resend_igmp": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "slaves": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "tlb_dynamic_lb": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "updelay": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "use_carrier": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      },
+      "xmit_hash_policy": {
+        "type": "string",
+        "pattern": "^(?!.%*[|&;<>=*?$(){}\\[\\]`'\"\\t\\n\\r]).*$"
+      }
+    },
+    "minProperties": 1
+  }

@@ -1,0 +1,28 @@
+# configuration for the server bond scripts
+# change the number of tunnels here
+# this needs to be the same on Server and Client
+
+numberOfTunnels=2
+
+# the bondingMode decides how the load is spread over the interfaces
+# mode=0 (Balance Round Robin)
+# mode=1 (Active backup)
+# mode=2 (Balance XOR)
+# mode=3 (Broadcast)
+# mode=4 (802.3ad)
+# mode=5 (Balance TLB)
+# mode=6 (Balance ALB)
+# this needs to be the same on Server and client
+
+bondingMode=1
+bondingPrimary=tap1
+bondingMiimon=100
+
+# You probably do not need to change any of these
+
+bondInterface=br0
+ipTrunk="10.8.0"
+ipMask="255.255.255.0"
+bondIP="${ipTrunk}.254"
+
+

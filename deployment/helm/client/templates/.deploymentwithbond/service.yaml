@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "deploymentwithbond.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "deploymentwithbond.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.deploymentwithbond.service.type }}
+  ports:
+    - name: port1
+      port: {{ .Values.deploymentwithbond.service.ports.port1.port }}
+      targetPort: {{ .Values.deploymentwithbond.service.ports.port1.targetPort }}
+      protocol: {{ .Values.deploymentwithbond.service.ports.port1.protocol }}
+      {{- if and (or (eq .Values.deploymentwithbond.service.type "NodePort") (eq .Values.deploymentwithbond.service.type "LoadBalancer")) (not (empty .Values.deploymentwithbond.service.ports.port1.nodePort)) }}
+      nodePort: {{ .Values.deploymentwithbond.service.ports.port1.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "deploymentwithbond.selectorLabels" . | nindent 4 }}

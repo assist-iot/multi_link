@@ -1,0 +1,785 @@
+---
+openapi: 3.0.2
+info:
+  version: 2.0.0
+  title: Multi-link OpenAPI
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: 'This is the OpenAPI for the Multi-Link Enabler of ASSIST-IoT. The
+    OpenAPI is divided into two elements that compose the Multi-Link Enabler: the
+    client and the server. If you have any doubts, you can refer to the enabler [documentation](https://assist-iot-enablers-documentation.readthedocs.io/en/latest/horizontal_planes/smart/multi_link_enabler.html).'
+paths:
+  "/v1/server/start":
+    post:
+      tags:
+      - Server
+      summary: Start the server on a multi-link enabler deployment
+      description: Start the multi-link server creating a bridge interface named `bridge_interface` with the IP address `ip` and slave them the number of `links`
+      operationId: startServer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Start_server"
+            example:
+              bride_interface: br0
+              bridge_ip: 10.8.0.254
+              links: '2'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Server started succesfully!
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                - Invalid JSON
+        '409':
+          description: Content-Type not supported
+          content:
+            application/json:
+              schema:
+                type: string
+                example: The server is already started, if you want to restart it,
+                  first stop them
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/server/key":
+    get:
+      tags:
+      - Server
+      summary: Get the server key of the tap tunnels
+      description: Return the key of the tap tunnels, it is used by the client to get the symmetric key and be able to establish the tunnel connections
+      operationId: getKeyServer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  key: " # # 2048 bit OpenVPN static key # -----BEGIN OpenVPN Static
+                    key V1----- 98a0de3e054bf93a8f7987f6d6e1a1fa 5335030b6478797e16c54098f278fef8
+                    e1560b25a9d427b15647afdf6f051558 b4a230baf7829878ffcbb1afc7c68f15
+                    15a6668d18ab9f642dec8805b70e6ff1 a8046568d89135662296f2dfe720545a
+                    1c407bdfa9e9b718506ec6c0fe1fc131 4ad69b1003b4f947da58b8aecd1e8324
+                    122ca5e0a3eabb025374240b974048f9 2da9071c3e6525626f18cffe0c33a18b
+                    7ef59bbfc562d7b64af7584db4de5cc3 57eae2ef4d77ea745bda027177c1f2ba
+                    9a8cf6dd0c5c7abb4200c7686c447eda c54f095ddb097d1874864138e73e545e
+                    2103b399fedcbe8ad1ce565b0a78c3d2 7b5ea0bd9dc2d9a78ca532f62302fb90
+                    -----END OpenVPN Static key V1-----"
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/server/stop/{bridge_interface}":
+    post:
+      tags:
+      - Server
+      summary: Stop the server of the Multilink enabler
+      description: Stop the multilink server removing all the configuration related to the bridge interface previously created and named `bridge_interface`
+      parameters:
+      - in: path
+        name: bridge_interface
+        description: Bridge interface that has been created on the start server request
+        schema:
+          type: string
+        required: true
+      operationId: stopServer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Server stopped successfully!
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                - The parameter ${bridge} contains chars not supported
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Interface ${bridge} not found
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/server/status":
+    get:
+      tags:
+      - Server
+      summary: Check if the server has been initialized
+      description: Check if the server has been initialized
+      operationId: serverStatus
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  server_running: "true"
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/client/start":
+    post:
+      tags:
+      - Client
+      summary: Start the client on a multi-link enabler deployment
+      description: Start the multi-link server creating a `bond` with the configuration as request body.
+      operationId: startClient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Start_client"
+            example:
+              server_api_url: http://158.42.89.111:3333
+              bond:
+                bond0:
+                  ip_address: 10.8.0.253
+                  slaves:
+                  - hw_int: eth0
+                    ip_server: 158.42.89.111
+                    netmask: 255.255.255.0
+                  - hw_int: wlan0
+                    ip_server: 192.168.150.100
+                    netmask: 255.255.255.0
+                  bonding:
+                    bonding_mode: '1'
+                    primary: tap1
+                    arp_ip_target: 10.8.0.254
+                    arp_interval: '100'
+                    fail_over_mac: '1'
+                    arp_validate: '5'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Client started ok
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                - schema_validation_error
+        '409':
+          description: Content-Type not supported
+          content:
+            application/json:
+              schema:
+                type: string
+                example: The client is already started, if you want to restart it
+                  then stop them first
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/tap_down/{tap}":
+    post:
+      summary: Bring down tap interface
+      parameters:
+      - in: path
+        name: tap
+        required: true
+        schema:
+          type: string
+      tags:
+      - Common endpoints
+      description: Bring down tap interface named `tap`
+      operationId: tapDown
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Succesfully bring down interface ${tap}
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                - The parameter ${tap} contains chars not supported
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: The tap interface ${tap} don't exist
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/tap_up/{tap}":
+    post:
+      summary: Bring up tap interface
+      parameters:
+      - in: path
+        name: tap
+        required: true
+        schema:
+          type: string
+      tags:
+      - Common endpoints
+      description: Bring up tap interface named `tap`
+        between links.
+      operationId: tapUp
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Succesfully bring up interface ${tap}
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                - The parameter ${tap} contains chars not supported
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: The tap interface ${tap} don't exist
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/client/status":
+    get:
+      summary: Check if the client has been initialized
+      tags:
+      - Client
+      description: Return if the client is running or not
+      operationId: clientStatus
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  client_running: "true"
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/ping_test":
+    post:
+      tags:
+      - Common endpoints
+      summary: Ping test to ip address
+      description: Make ping request to the ip address `ip`
+      operationId: pingTest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Ping_test"
+            example:
+              ip: 10.8.0.254
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  ping_log: |
+                    PING 10.8.0.254 (10.8.0.254) 56(84) bytes of data.
+                    64 bytes from 10.8.0.254: icmp_seq=1 ttl=64 time=1.50 ms
+                    64 bytes from 10.8.0.254: icmp_seq=2 ttl=64 time=1.40 ms
+                    64 bytes from 10.8.0.254: icmp_seq=3 ttl=64 time=1.92 ms
+                    64 bytes from 10.8.0.254: icmp_seq=4 ttl=64 time=1.86 ms
+                    64 bytes from 10.8.0.254: icmp_seq=5 ttl=64 time=1.56 ms
+
+                    --- 10.8.0.254 ping statistics ---
+                    5 packets transmitted, 5 received, 0% packet loss, time 4006ms
+                    rtt min/avg/max/mdev = 1.397/1.645/1.915/0.203 ms
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                - schema_validation_error
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                - Ping {ip} failed
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/client/stop/{bond_interface}":
+    post:
+      tags:
+      - Client
+      summary: Stop the client of the Multilink enabler
+      parameters:
+      - in: path
+        name: bond_interface
+        required: true
+        schema:
+          type: string
+      description: Stop the multilink client removing all the configuration related to the bond interface previously created and named `bond_interface`
+      operationId: stopClient
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Client stopped
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                - The parameter {bond} contains chars not supported
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Interface {bond} not found
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/client/bond_params/{bond_interface}":
+    put:
+      tags:
+      - Client
+      summary: Change parameters of the bond
+      parameters:
+      - in: path
+        name: bond_interface
+        required: true
+        schema:
+          type: string
+      description: Change bond parameters of the bond interface named `bond_interface`
+      operationId: changeBondParameters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Bond_parameters"
+            example:
+              primary: "tap2"
+              arp_interval: "50"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Client stopped
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                - The parameter {bond} contains chars not supported
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Interface {bond} not found
+        '500':
+          description: Internal error
+          content: {}
+    get:
+      summary: Get parameters of the bond
+      parameters:
+      - in: path
+        name: bond_interface
+        required: true
+        schema:
+          type: string
+      tags:
+      - Client
+      description: Get all the parameters of the bond interface named `bond_interface`
+      operationId: bondInfo
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                  active_slave: tap1
+                  ad_actor_key: ''
+                  ad_actor_sys_prio: ''
+                  ad_actor_system: ''
+                  ad_aggregator: ''
+                  ad_num_ports: ''
+                  ad_partner_key: ''
+                  ad_partner_mac: ''
+                  ad_select: stable 0
+                  ad_user_port_key: ''
+                  all_slaves_active: '0'
+                  arp_all_targets: any 0
+                  arp_interval: '50'
+                  arp_ip_target: 10.8.0.254
+                  arp_missed_max: '2'
+                  arp_validate: none 0
+                  downdelay: '0'
+                  fail_over_mac: active 1
+                  lacp_active: on 1
+                  lacp_rate: slow 0
+                  lp_interval: '1'
+                  mii_status: up
+                  miimon: '0'
+                  min_links: '0'
+                  mode: active-backup 1
+                  num_grat_arp: '1'
+                  num_unsol_na: '1'
+                  packets_per_slave: '1'
+                  peer_notif_delay: '0'
+                  primary: tap1
+                  primary_reselect: always 0
+                  queue_id: tap2:0 tap1:0
+                  resend_igmp: '1'
+                  slaves: tap2 tap1
+                  tlb_dynamic_lb: '1'
+                  updelay: '0'
+                  use_carrier: '1'
+                  xmit_hash_policy: layer2 0
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+                example:
+                - The parameter ${bond} contains chars not supported
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Interface ${bond} not found
+        '500':
+          description: Internal error
+          content: {}
+  "/version":
+    get:
+      tags:
+      - Common endpoints
+      summary: Get version
+      description: Get current enabler `version`
+      operationId: getVersion
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              example:
+                version: v1
+        '500':
+          description: Internal error
+          content: {}
+  "/health":
+    get:
+      tags:
+      - Common endpoints
+      summary: Get health status
+      description: Returns enabler's helth status
+      operationId: getHealth
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              example:
+                helath: healthy
+        '500':
+          description: Internal error
+          content: {}
+  "/v1/api-export":
+    get:
+      tags:
+      - Common endpoints
+      summary: Get OpenAPI documentation
+      description: Returns enabler's OpenAPI documentation
+      operationId: getOpenAPI
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              example:
+                openapi: 3.0.2
+                info:
+                  version: 2.0.0
+                  title: Multi-link OpenAPI
+                  license:
+                    name: Apache 2.0
+                    url: http://www.apache.org/licenses/LICENSE-2.0.html
+                "...": "..."
+        '500':
+          description: Internal error
+          content: {}
+components:
+  schemas:
+    Start_server:
+      type: object
+      properties:
+        bridge_interface:
+          type: string
+          pattern: ^(?!.%*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        bridge_ip:
+          type: string
+          pattern: "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^([0-9a-fA-F]{1,4}:){1,6}:(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+        links:
+          type: string
+          pattern: ^(?!.%*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+      required:
+      - bridge_interface
+      - bridge_ip
+      - links
+    Start_client:
+      type: object
+      properties:
+        server_api_url:
+          type: string
+          pattern: ^(?!.%*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        bond:
+          type: object
+          properties:
+            bond0:
+              type: object
+              properties:
+                ip_address:
+                  type: string
+                  pattern: "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^([0-9a-fA-F]{1,4}:){1,6}:(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                slaves:
+                  type: array
+                  minItems: 2
+                  items:
+                    type: object
+                    properties:
+                      hw_int:
+                        type: string
+                        pattern: ^(?!.%*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+                      ip_server:
+                        type: string
+                        pattern: "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^([0-9a-fA-F]{1,4}:){1,6}:(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                      netmask:
+                        type: string
+                        pattern: "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^([0-9a-fA-F]{1,4}:){1,6}:(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                    required:
+                    - hw_int
+                    - ip_server
+                    - netmask
+                bonding:
+                  type: object
+                  properties:
+                    bonding_mode:
+                      type: string
+                      pattern: ^(?!.%*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+                    primary:
+                      type: string
+                      pattern: ^(?!.%*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+                    arp_ip_target:
+                      type: string
+                      pattern: ^(?!.%*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+                    arp_interval:
+                      type: string
+                      pattern: ^(?!.%*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+                    fail_over_mac:
+                      type: string
+                      pattern: ^(?!.%*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+                    arp_validate:
+                      type: string
+                      pattern: ^(?!.%*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+                  required:
+                  - bonding_mode
+                  - primary
+                  - arp_ip_target
+                  - arp_interval
+                  - fail_over_mac
+              required:
+              - ip_address
+              - slaves
+              - bonding
+      required:
+      - server_api_url
+      - bond
+
+    Bond_parameters:
+      type: object
+      properties:
+        active_slave:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        ad_actor_key:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        ad_actor_sys_prio:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        ad_actor_system:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        ad_aggregator:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        ad_num_ports:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        ad_partner_key:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        ad_partner_mac:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        ad_select:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        ad_user_port_key:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        all_slaves_active:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        arp_all_targets:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        arp_interval:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        arp_ip_target:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        arp_missed_max:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        arp_validate:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        downdelay:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        fail_over_mac:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        lacp_active:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        lacp_rate:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        lp_interval:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        mii_status:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        miimon:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        min_links:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        mode:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        num_grat_arp:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        num_unsol_na:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        packets_per_slave:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        peer_notif_delay:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        primary:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        primary_reselect:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        queue_id:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        resend_igmp:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        slaves:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        tlb_dynamic_lb:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        updelay:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        use_carrier:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+        xmit_hash_policy:
+          type: string
+          pattern: ^(?!.*[|&;<>=*?$(){}\[\]`'"\t\n\r]).*$
+      minProperties: 1
+    Ping_test:
+      type: object
+      properties:
+        ip:
+          type: string
+          pattern: "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^([0-9a-fA-F]{1,4}:){1,6}:(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+      required:
+      - ip

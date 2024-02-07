@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "deploymentwithbond.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "deploymentwithbond.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.deploymentwithbond.autoscaling.enabled }}
+  replicas: {{ .Values.deploymentwithbond.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "deploymentwithbond.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "deploymentwithbond.labels" . | nindent 8 }}
+    spec:
+      hostNetwork: {{ .Values.deploymentwithbond.hostNetwork }}
+      {{- with .Values.deploymentwithbond.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.enablerNodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if not .Values.enablerNodeSelector }}
+        {{- with .Values.deploymentwithbond.nodeSelector }}
+      nodeSelector:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.deploymentwithbond.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deploymentwithbond.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.deploymentwithbond.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init-container-verificacion-http
+          image: curlimages/curl:latest 
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              while true; do
+                # Check if the client is running to start the deployment
+                curl -s http://{{ .Values.hostIp }}:{{ .Values.api.service.ports.api.port }}/v1/server/status | grep true && break
+              done
+      containers:
+        - name: deploymentwithbond
+          securityContext:
+            {{- toYaml .Values.deploymentwithbond.securityContext | nindent 12 }}
+          image: "{{ .Values.deploymentwithbond.image.repository }}:{{ .Values.deploymentwithbond.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.deploymentwithbond.image.pullPolicy }}
+          ports:
+            - name: port1
+              containerPort: {{ .Values.deploymentwithbond.service.ports.port1.containerPort }}
+              protocol: {{ .Values.deploymentwithbond.service.ports.port1.protocol }}
+          resources:
+            {{- toYaml .Values.deploymentwithbond.resources | nindent 12 }}
+          {{- with .Values.deploymentwithbond.envVars }}
+          env:
+            - name: EXAMPLE_ENV_VAR
+              value: {{ .exampleEnvVar | quote }}
+          {{- end }}

@@ -1,0 +1,78 @@
+
+POST http://localhost:3333/v1/client/start
+Content-Type: application/json
+
+{
+  "server_api_url": "http://158.42.89.111:3333",
+  "bond":{
+    "bond0": {
+      "ip_address": "10.8.0.253",
+      "slaves": {
+        "tap1": {
+          "hw_int": "eth0",
+          "ip_server": "158.42.89.111",
+          "netmask": "255.255.255.0"
+        },
+        "tap2": {
+          "hw_int": "wlan0",
+          "ip_server": "192.168.150.100",
+          "netmask": "255.255.255.0"
+        }
+      },
+      "bonding": {
+        "bonding_mode": "1",
+        "primary": "tap1",
+        "arp_ip_target": "10.8.0.254",
+        "arp_interval": "100",
+        "fail_over_mac": "1",
+        "arp_validate": "5"
+      }
+    }  
+  }  
+}
+
+###
+POST http://localhost:3333/v1/tap_down/tap1
+
+###
+POST http://localhost:3333/v1/tap_up/tap1
+
+###
+POST http://localhost:3333/v1/tap_down/tap2
+
+###
+POST http://localhost:3333/v1/tap_up/tap2
+
+###
+GET http://localhost:3333/v1/client/bond_params/bond0
+
+###
+POST http://localhost:3333/v1/ping_test
+Content-Type: application/json
+
+{
+  "ip": "10.8.0.254"
+}
+
+###
+PUT http://localhost:3333/v1/client/bond_params/bond0
+Content-Type: application/json
+
+{
+  "primary": "tap2"
+}
+
+###
+POST http://localhost:3333/v1/client/stop/bond0
+
+###
+GET http://localhost:3333/v1/client/status
+
+###
+GET http://localhost:3333/v1/api-export
+
+###
+GET http://localhost:3333/version
+
+###
+GET http://localhost:3333/health

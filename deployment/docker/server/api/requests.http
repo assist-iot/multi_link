@@ -1,0 +1,45 @@
+###
+POST http://localhost:3333/v1/server/start
+Content-Type: application/json
+
+{
+  "bridge_interface": "br0",
+  "bridge_ip": "10.8.0.254",
+  "interfaces_n": "2"
+}
+
+###
+GET http://localhost:3333/v1/server_key
+
+###
+POST http://localhost:3333/v1/tap_down/tap1
+
+###
+POST http://localhost:3333/v1/tap_up/tap1
+
+###
+POST http://localhost:3333/v1/tap_down/tap2
+
+###
+POST http://localhost:3333/v1/tap_up/tap2
+
+###
+POST http://localhost:3333/v1/ping_test
+Content-Type: application/json
+
+{
+  "ip": "10.8.0.253"
+}
+
+
+###
+POST http://localhost:3333/v1/server/stop/br0
+
+###
+GET http://localhost:3333/v1/api-export
+
+###
+GET http://localhost:3333/version
+
+###
+GET http://localhost:3333/health

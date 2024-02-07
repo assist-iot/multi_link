@@ -1,0 +1,210 @@
+# Default values for enabler.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+####################################### VALUES TO CONFIG THE SERVER #######################################
+
+serverConfig:
+  bridge_interface: br0
+  bridge_ip: 10.8.0.254
+  links: 2
+
+################################################### END ###################################################
+
+# String to partially override enabler.fullname template (will maintain the release name).
+nameOverride: ""
+# String to fully override enabler.fullname template.
+fullnameOverride: ""
+# Deploy all the components in specific K8s node(s).
+enablerNodeSelector: {}
+# Cilium Multi-cluster global service.
+globalService: false
+
+# Ip to reach localhost, hostNetwork is set to true so it will be localhost
+hostIp: localhost
+
+# Component api values.
+api:
+  tier: external
+  replicaCount: 1
+
+  # Configure the deployment with the network of the host
+  hostNetwork: true
+
+  # Configuration of the container image.
+  imagePullSecrets: []
+  image:
+    repository: assistiot/multi-link_server
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  
+  # Configuration of the service: type and ports.
+  service:
+    type: NodePort
+    ports:
+      api:
+        port: 3333
+        targetPort: 3333
+        containerPort: 3333
+        nodePort: ""
+        protocol: TCP
+
+  # The specification of the resources is needed for the proper functioning 
+  # of the Smart Orchestrator enabler (requests)
+  # and of the Resource provisioning enabler (limits).
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    # minReplicas: 1
+    # maxReplicas: 3
+    # targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext:
+    privileged: true
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  # Include here the environment variables to be used in containers section of the component's manifest.
+  # TODO: Here and in the manifest is included an example, please adapt them to the requirements of your component.
+  envVars:
+    exampleEnvVar: exampleValue
+    apiMultilinkServerPort: 3333
+
+  # Component data persistence
+  persistence:
+    enabled: true
+    existingClaim: ""
+    # mountPath: /path/in/container
+    accessModes:
+      - ReadWriteOnce
+    size: 50Mi
+
+  # Configure this parameters to deploy the component in specific K8s node(s).
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Component deploymentwithbond values.
+deploymentwithbond:
+  tier: internal
+  replicaCount: 1
+
+  # Configure the deployment with the network of the host
+  hostNetwork: true
+
+  # Configuration of the container image.
+  imagePullSecrets: []
+  image:
+    repository: ubuntu
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "rolling"
+    pullPolicy: IfNotPresent
+  
+  # Configuration of the service: type and ports.
+  service:
+    type: NodePort
+    ports:
+      port1:
+        port: 5556
+        targetPort: 5556
+        containerPort: 5556
+        nodePort: ""
+        protocol: TCP
+
+  # The specification of the resources is needed for the proper functioning 
+  # of the Smart Orchestrator enabler (requests)
+  # and of the Resource provisioning enabler (limits).
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    # minReplicas: 1
+    # maxReplicas: 3
+    # targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  # Include here the environment variables to be used in containers section of the component's manifest.
+  # TODO: Here and in the manifest is included an example, please adapt them to the requirements of your component.
+  envVars:
+    exampleEnvVar: exampleValue
+
+
+  # Configure this parameters to deploy the component in specific K8s node(s).
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+initserver:
+  imagePullSecrets: []
+
+  # Configure the job with the network of the host
+  hostNetwork: true
+
+  image:
+    repository: curlimages/curl
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "8.4.0"
+    pullPolicy: IfNotPresent
+
+  restartPolicy: OnFailure
+  backoffLimit: 6
+
+
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  podSecurityContext: {}
+  securityContext: {}
+
+  # Include here the environment variables to be used in containers section of the job's manifest.
+  # TODO: Here and in the manifest is included an example, please adapt them to the requirements of your component.
+  envVars:
+    exampleEnvVar: exampleValue
+
+  # Configure this parameters to deploy the job in specific K8s node(s).
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+

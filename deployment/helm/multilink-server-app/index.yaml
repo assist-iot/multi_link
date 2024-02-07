@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  multilink-server:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-02-07T09:24:34.774330085Z"
+    description: A Helm chart for Kubernetes
+    digest: 818bf6c854dbd635fcd463fefe4c3be6cb1907af955fcb9c2b8d2d4bb2a9f725
+    name: multilink-server
+    type: application
+    urls:
+    - multilink-server-1.0.0.tgz
+    version: 1.0.0
+generated: "2024-02-07T09:24:34.770898668Z"

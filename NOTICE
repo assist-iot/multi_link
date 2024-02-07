@@ -1,0 +1,29 @@
+ASSIST-IoT - Architecture for Scalable, Self-*, human-centric, Intelligent, Se-cure, and Tactile next generation IoT
+
+This project has received funding from the European Union's Horizon 2020
+
+research and innovation programme under grant agreement No 957258.
+
+Multi-link enabler
+
+Copyright 2020-2023 Universitat Politècnica de València
+
+I. Included Software
+
+-   nodejs/express (https://github.com/expressjs/express), MIT
+
+-   nodejs/child_process (https://www.npmjs.com/package/child_process), ISC
+
+-   nodejs/ajv (https://github.com/ajv-validator/ajv), MIT
+
+-   nodejs/fs (https://www.npmjs.com/package/fs), ISC
+
+-   nodejs/axios (https://github.com/axios/axios), MIT
+
+II. Used Software
+
+III. List of licenses
+
+-   MIT license (https://www.mit.edu/~amini/LICENSE.md)
+
+-   ISC license (https://www.isc.org/licenses/)

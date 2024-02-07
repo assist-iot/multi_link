@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "initclient.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "initclient.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      hostNetwork: {{ .Values.initclient.hostNetwork }}
+      {{- with .Values.initclient.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.initclient.podSecurityContext | nindent 8 }}
+      containers:
+      - name: initclient
+        securityContext:
+          {{- toYaml .Values.initclient.securityContext | nindent 12 }}
+        image: "{{ .Values.initclient.image.repository }}:{{ .Values.initclient.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.initclient.image.pullPolicy }}
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            while true; do
+              curl -X POST http://{{ .Values.hostIp }}:{{ .Values.api.service.ports.api.port }}/v1/client/stop/{{ .Values.clientConfig.bondInterfaceName }}
+              response=$(curl -s -w "%{http_code}" -X POST http://{{ .Values.hostIp }}:{{ .Values.api.service.ports.api.port }}/v1/client/start -H 'Content-Type: application/json' -d '{ 
+                "server_api_url": "{{ .Values.clientConfig.serverApiUrl }}", 
+                "bond":{ 
+                  "{{ .Values.clientConfig.bondInterfaceName }}": { 
+                    "ip_address": "{{ .Values.clientConfig.bondIpAddress }}", 
+                    "slaves":
+                      {{ .Values.clientConfig.slaves | toJson }},
+                    "bonding": { 
+                      "bonding_mode": "{{ .Values.clientConfig.bonding_mode }}", 
+                      "primary": "{{ .Values.clientConfig.primary }}", 
+                      "arp_ip_target": "{{ .Values.clientConfig.arp_ip_target }}", 
+                      "arp_interval": "{{ .Values.clientConfig.arp_interval }}", 
+                      "fail_over_mac": "{{ .Values.clientConfig.fail_over_mac }}", 
+                      "arp_validate": "{{ .Values.clientConfig.arp_validate }}"} 
+                  } 
+                } 
+              }')
+              echo $response
+              status_code=${response: -3} # Get the last 3 characters of the response (HTTP status code)
+              if [ "$status_code" = "200" ]; then
+                break # Exit the loop if HTTP status code is 200 (OK)
+              else
+                sleep 5 # Wait for 5 seconds before making the next request
+              fi
+              done;
+              while true; do
+                sleep 30 
+              done;
+      restartPolicy: {{ .Values.initclient.restartPolicy }}
+  backoffLimit: {{ .Values.initclient.backoffLimit }}
